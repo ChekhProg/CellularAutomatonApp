@@ -2,6 +2,7 @@ import random
 import time
 
 import numpy as np
+from PyQt6.QtCore import Qt
 
 from GridSquare2D import GridSquare2D
 
@@ -12,6 +13,7 @@ class GridSquare2DFlat(GridSquare2D):
         height = height + 1
         super().__init__(width, height)
         self.cells = np.zeros((height * width), dtype=bool)
+        self.colors = {False: Qt.GlobalColor.black, True: Qt.GlobalColor.darkYellow}
 
     def set_random(self):
         for i in range(1, self.height - 1):
@@ -68,3 +70,12 @@ class GridSquare2DFlat(GridSquare2D):
     def getCellStatus(self, x, y):
         pos = (x + 1) * self.width + (y + 1)
         return self.cells[pos]
+
+    def changeCellStatus(self, x, y):
+        pos = (x + 1) * self.width + (y + 1)
+        new_state = True
+        if self.cells[pos]:
+            new_state = False
+        self.cells[pos] = new_state
+        return new_state
+
