@@ -9,8 +9,7 @@ from PyQt6.QtWidgets import QGraphicsScene, QGraphicsView, QGraphicsRectItem, QA
     QVBoxLayout, QHBoxLayout, QPushButton, QSizePolicy, QSlider, QLabel, QGridLayout, QSpinBox, QLineEdit, QLayout, \
     QFileDialog
 
-from GridSquare2D import GridSquare2D
-from GridSquare2DFlat import GridSquare2DFlat
+from GameOfLife import GameOfLife
 
 
 class CellView(QGraphicsRectItem):
@@ -38,16 +37,16 @@ class UniverseView(QGraphicsView):
         self.timer.timeout.connect(lambda: self.step())
         self.main_widget = main_widget
 
-        rows = 40
+        rows = 80
         self.rows = rows
-        columns = 40
+        columns = 80
         self.columns = columns
-        size = 10
+        size = 8
         self.size = size
 
         self.scene = QGraphicsScene(0, 0, columns * size, rows * size)
 
-        self.universe = GridSquare2DFlat(self.columns, self.rows)
+        self.universe = GameOfLife(self.columns, self.rows)
         self.initCellsView()
         self.redrawUniverse()
 
@@ -106,12 +105,12 @@ class UniverseView(QGraphicsView):
 
     def changeRows(self, rows):
         self.rows = rows
-        self.universe = GridSquare2DFlat(self.columns, self.rows)
+        self.universe = GameOfLife(self.columns, self.rows)
         self.changeSize(self.size)
 
     def changeColumns(self, columns):
         self.columns = columns
-        self.universe = GridSquare2DFlat(self.columns, self.rows)
+        self.universe = GameOfLife(self.columns, self.rows)
         self.changeSize(self.size)
 
     def changeSize(self, size):
@@ -136,7 +135,7 @@ class UniverseView(QGraphicsView):
         self.columns = data["width"]
         self.rows = data["height"]
         cells = list(map(lambda x: bool(x), data["cells"]))
-        self.universe = GridSquare2DFlat(self.columns, self.rows, cells)
+        self.universe = GameOfLife(self.columns, self.rows, cells)
         self.initCellsView()
         self.changeSize(self.size)
         self.redrawUniverse()
@@ -258,8 +257,8 @@ class ToolBar(QWidget):
 
     def changeColumns(self, x):
         self.view.runEvo(False)
-        self.view.changeColumns(x)
         self.btn_start.setChecked(False)
+        self.view.changeColumns(x)
 
     def clear(self):
         self.view.runEvo(False)
@@ -272,6 +271,8 @@ class ToolBar(QWidget):
         self.btn_start.setChecked(False)
 
     def openFile(self):
+        self.view.runEvo(False)
+        self.btn_start.setChecked(False)
         filename = QFileDialog.getOpenFileName(caption="Open File", filter="*.json")[0]
         with open(filename, "r") as read_file:
             data = json.load(read_file)
@@ -280,6 +281,8 @@ class ToolBar(QWidget):
         self.view.fromJson(filename)
 
     def saveFile(self):
+        self.view.runEvo(False)
+        self.btn_start.setChecked(False)
         filename = QFileDialog.getSaveFileName(caption="Save File", filter="*.json")[0]
         self.view.toJson(filename)
 
