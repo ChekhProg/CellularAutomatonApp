@@ -10,6 +10,7 @@ from PyQt6.QtWidgets import QGraphicsScene, QGraphicsView, QGraphicsRectItem, QA
     QFileDialog
 
 from GameOfLife import GameOfLife
+from GameOfLifeWithAge import GameOfLifeWithAge
 
 
 class CellView(QGraphicsRectItem):
@@ -46,12 +47,16 @@ class UniverseView(QGraphicsView):
 
         self.scene = QGraphicsScene(0, 0, columns * size, rows * size)
 
-        self.universe = GameOfLife(self.columns, self.rows)
+        self.initUniverse()
         self.initCellsView()
         self.redrawUniverse()
 
         self.setSizePolicy(QSizePolicy.Policy.Fixed, QSizePolicy.Policy.Fixed)
         self.setScene(self.scene)
+
+    def initUniverse(self, cells=None, rule=None):
+        self.universe = GameOfLifeWithAge(self.columns, self.rows, cells=cells, rule=rule)
+        #self.universe = GameOfLife(self.columns, self.rows, cells=cells, rule=rule)
 
     def initCellsView(self):
         cells = np.zeros((self.rows * self.columns), dtype=object)
@@ -82,6 +87,7 @@ class UniverseView(QGraphicsView):
     def step(self, n=1):
         stime = time.time()
         self.universe.next_gen(n)
+
         self.redrawUniverse()
         etime = time.time() - stime
         print(etime)
@@ -105,12 +111,12 @@ class UniverseView(QGraphicsView):
 
     def changeRows(self, rows):
         self.rows = rows
-        self.universe = GameOfLife(self.columns, self.rows)
+        self.initUniverse()
         self.changeSize(self.size)
 
     def changeColumns(self, columns):
         self.columns = columns
-        self.universe = GameOfLife(self.columns, self.rows)
+        self.initUniverse()
         self.changeSize(self.size)
 
     def changeSize(self, size):
@@ -135,7 +141,7 @@ class UniverseView(QGraphicsView):
         self.columns = data["width"]
         self.rows = data["height"]
         cells = list(map(lambda x: bool(x), data["cells"]))
-        self.universe = GameOfLife(self.columns, self.rows, cells)
+        self.initUniverse(cells=cells)
         self.initCellsView()
         self.changeSize(self.size)
         self.redrawUniverse()
@@ -151,7 +157,7 @@ class ToolBar(QWidget):
         # Rows Horizontal Layout
         lbl_rows = QLabel("Rows: ")
         self.spinbox_rows = QSpinBox()
-        self.spinbox_rows.setRange(40, 200)
+        self.spinbox_rows.setRange(40, 100)
         self.spinbox_rows.setValue(view.rows)
         #spinbox_rows.lineEdit().setDisabled(True)
         self.spinbox_rows.valueChanged.connect(lambda x: self.changeRows(x))
@@ -164,7 +170,7 @@ class ToolBar(QWidget):
         # Rows Horizontal Layout
         lbl_columns = QLabel("Columns: ")
         self.spinbox_columns = QSpinBox()
-        self.spinbox_columns.setRange(40, 200)
+        self.spinbox_columns.setRange(40, 100)
         self.spinbox_columns.setValue(view.columns)
         #spinbox_columns.lineEdit().setDisabled(True)
         self.spinbox_columns.valueChanged.connect(lambda x: self.changeColumns(x))
@@ -177,7 +183,7 @@ class ToolBar(QWidget):
         # Size Horizontal Layout
         lbl_size = QLabel("Size: ")
         spinbox_steps = QSpinBox()
-        spinbox_steps.setRange(4, 20)
+        spinbox_steps.setRange(5, 13)
         spinbox_steps.setValue(view.size)
         spinbox_steps.lineEdit().setDisabled(True)
         spinbox_steps.valueChanged.connect(lambda s: view.changeSize(s))

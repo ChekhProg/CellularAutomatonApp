@@ -7,10 +7,10 @@ from PyQt6.QtCore import Qt
 class GameOfLife:
     def __init__(self, width, height, cells=None, rule=None):
         if rule is None:
-            #rule = {"B": [2], "S": [2, 3]}
+            rule = {"B": [3], "S": [2, 3]}
             #rule = {"B": [3,5,6,7,8], "S": [5,6,7,8]}
             #rule = {"B": [1,3,5,7], "S": [1,3,5,7]}
-            rule = {"B": [3,6,7,8], "S": [3,4,6,7,8]}
+            #rule = {"B": [3,6,7,8], "S": [3,4,6,7,8]}
         self.rule = rule
         self.width = width + 2
         self.height = height + 2
@@ -18,7 +18,7 @@ class GameOfLife:
             self.cells = np.zeros((self.height * self.width), dtype=bool)
         else:
             self.cells = np.array(cells)
-        self.colors = {False: Qt.GlobalColor.black, True: Qt.GlobalColor.darkGreen}
+        self.colors = {False: Qt.GlobalColor.black, True: Qt.GlobalColor.green}
 
     def set_random(self):
         for i in range(1, self.height - 1):
