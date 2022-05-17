@@ -1,3 +1,4 @@
+import json
 import random
 import time
 
@@ -7,12 +8,14 @@ from PyQt6.QtCore import Qt
 from GridSquare2D import GridSquare2D
 
 
-class GridSquare2DFlat(GridSquare2D):
-    def __init__(self, width, height):
-        width = width + 2
-        height = height + 2
-        super().__init__(width, height)
-        self.cells = np.zeros((height * width), dtype=bool)
+class GridSquare2DFlat:
+    def __init__(self, width, height, cells=None):
+        self.width = width + 2
+        self.height = height + 2
+        if cells is None:
+            self.cells = np.zeros((self.height * self.width), dtype=bool)
+        else:
+            self.cells = np.array(cells)
         self.colors = {False: Qt.GlobalColor.black, True: Qt.GlobalColor.darkGreen}
 
     def set_random(self):
@@ -53,6 +56,7 @@ class GridSquare2DFlat(GridSquare2D):
                             new_status = True
                     new_cells[pos] = new_status
             self.cells = new_cells
+
         for k in range(n):
             gen()
 
@@ -67,4 +71,3 @@ class GridSquare2DFlat(GridSquare2D):
             new_state = False
         self.cells[pos] = new_state
         return new_state
-

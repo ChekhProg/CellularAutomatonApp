@@ -1,3 +1,4 @@
+import json
 import sys
 import time
 
@@ -5,7 +6,8 @@ import numpy as np
 from PyQt6.QtCore import Qt, QTimer, QSize
 from PyQt6.QtGui import QBrush, QPen, QPalette, QColor, QWindow
 from PyQt6.QtWidgets import QGraphicsScene, QGraphicsView, QGraphicsRectItem, QApplication, QMainWindow, QWidget, \
-    QVBoxLayout, QHBoxLayout, QPushButton, QSizePolicy, QSlider, QLabel, QGridLayout, QSpinBox, QLineEdit, QLayout
+    QVBoxLayout, QHBoxLayout, QPushButton, QSizePolicy, QSlider, QLabel, QGridLayout, QSpinBox, QLineEdit, QLayout, \
+    QFileDialog
 
 from GridSquare2D import GridSquare2D
 from GridSquare2DFlat import GridSquare2DFlat
@@ -38,7 +40,7 @@ class UniverseView(QGraphicsView):
 
         rows = 40
         self.rows = rows
-        columns = 80
+        columns = 40
         self.columns = columns
         size = 10
         self.size = size
@@ -64,9 +66,6 @@ class UniverseView(QGraphicsView):
                 cells[pos] = cell
                 self.scene.addItem(cell)
         self.cells = cells
-        print(self.cells.size)
-        print(self.rows)
-        print(self.columns)
         self.redrawUniverse()
 
     def setCellViewColor(self, x, y, color):
@@ -86,7 +85,7 @@ class UniverseView(QGraphicsView):
         self.universe.next_gen(n)
         self.redrawUniverse()
         etime = time.time() - stime
-        #print(etime)
+        print(etime)
 
     def reset(self):
         self.universe.clear()
@@ -125,74 +124,91 @@ class UniverseView(QGraphicsView):
         self.main_widget.setFixedSize(self.main_widget.sizeHint())
         self.redrawUniverse()
 
+    def toJson(self, filename):
+        cells = map(lambda x: int(x), self.universe.cells)
+        data = {"width": self.columns, "height": self.rows, "cells": list(cells)}
+        with open(filename, "w") as write_file:
+            json.dump(data, write_file)
+
+    def fromJson(self, filename):
+        with open(filename, "r") as read_file:
+            data = json.load(read_file)
+        self.columns = data["width"]
+        self.rows = data["height"]
+        cells = list(map(lambda x: bool(x), data["cells"]))
+        self.universe = GridSquare2DFlat(self.columns, self.rows, cells)
+        self.initCellsView()
+        self.changeSize(self.size)
+        self.redrawUniverse()
+
 
 class ToolBar(QWidget):
     def __init__(self, view):
         super().__init__()
+        self.view = view
         self.setFixedWidth(150)
         layout = QVBoxLayout()
 
         # Rows Horizontal Layout
-        rows_layout = QHBoxLayout()
-
         lbl_rows = QLabel("Rows: ")
-        spinbox_rows = QSpinBox()
-        spinbox_rows.setRange(40, 200)
-        spinbox_rows.setValue(view.rows)
-        spinbox_rows.lineEdit().setDisabled(True)
-        spinbox_rows.valueChanged.connect(lambda x: view.changeRows(x))
+        self.spinbox_rows = QSpinBox()
+        self.spinbox_rows.setRange(40, 200)
+        self.spinbox_rows.setValue(view.rows)
+        #spinbox_rows.lineEdit().setDisabled(True)
+        self.spinbox_rows.valueChanged.connect(lambda x: self.changeRows(x))
 
+        rows_layout = QHBoxLayout()
         rows_layout.addWidget(lbl_rows)
-        rows_layout.addWidget(spinbox_rows)
+        rows_layout.addWidget(self.spinbox_rows)
         # End Rows Layout
 
         # Rows Horizontal Layout
-        columns_layout = QHBoxLayout()
-
         lbl_columns = QLabel("Columns: ")
-        spinbox_columns = QSpinBox()
-        spinbox_columns.setRange(40, 200)
-        spinbox_columns.setValue(view.columns)
-        spinbox_columns.lineEdit().setDisabled(True)
-        spinbox_columns.valueChanged.connect(lambda x: view.changeColumns(x))
+        self.spinbox_columns = QSpinBox()
+        self.spinbox_columns.setRange(40, 200)
+        self.spinbox_columns.setValue(view.columns)
+        #spinbox_columns.lineEdit().setDisabled(True)
+        self.spinbox_columns.valueChanged.connect(lambda x: self.changeColumns(x))
 
+        columns_layout = QHBoxLayout()
         columns_layout.addWidget(lbl_columns)
-        columns_layout.addWidget(spinbox_columns)
+        columns_layout.addWidget(self.spinbox_columns)
         # End Rows Layout
 
         # Size Horizontal Layout
-        size_layout = QHBoxLayout()
-
         lbl_size = QLabel("Size: ")
         spinbox_steps = QSpinBox()
-        spinbox_steps.setRange(1, 20)
+        spinbox_steps.setRange(4, 20)
         spinbox_steps.setValue(view.size)
         spinbox_steps.lineEdit().setDisabled(True)
         spinbox_steps.valueChanged.connect(lambda s: view.changeSize(s))
 
+        size_layout = QHBoxLayout()
         size_layout.addWidget(lbl_size)
         size_layout.addWidget(spinbox_steps)
         # Size Step Layout
 
         btn_clear = QPushButton("Clear")
-        btn_clear.clicked.connect(lambda: view.reset())
+        btn_clear.clicked.connect(lambda: self.clear())
 
         btn_rand = QPushButton("Randomize")
-        btn_rand.clicked.connect(lambda: view.randomize())
+        btn_rand.clicked.connect(lambda: self.randomize())
 
         # Step Horizontal Layout
-        step_layout = QHBoxLayout()
         spinbox_steps = QSpinBox()
         spinbox_steps.setRange(1, 1000)
         btn_step = QPushButton("Step")
         btn_step.clicked.connect(lambda: view.step(spinbox_steps.value()))
+
+        step_layout = QHBoxLayout()
         step_layout.addWidget(btn_step)
         step_layout.addWidget(spinbox_steps)
-
-        btn_start = QPushButton("Run")
-        btn_start.setCheckable(True)
-        btn_start.clicked.connect(lambda c: view.runEvo(c))
         # End Step Layout
+
+        # Run
+        self.btn_start = QPushButton("Run")
+        self.btn_start.setCheckable(True)
+        self.btn_start.clicked.connect(lambda c: view.runEvo(c))
 
         lbl_fps = QLabel()
         lbl_ms = QLabel()
@@ -207,6 +223,17 @@ class ToolBar(QWidget):
 
         lbl_fps.setText("FPS: " + str(slider_speed.value()))
         lbl_ms.setText("ms: " + str(1000 // slider_speed.value()))
+        # End Run
+
+        # Open
+        btn_open = QPushButton("Open")
+        btn_open.clicked.connect(lambda: self.openFile())
+        # End Open
+
+        # Save
+        btn_save = QPushButton("Save")
+        btn_save.clicked.connect(lambda: self.saveFile())
+        # End Save
 
         layout.addLayout(rows_layout)
         layout.addLayout(columns_layout)
@@ -217,10 +244,44 @@ class ToolBar(QWidget):
         layout.addWidget(lbl_fps)
         layout.addWidget(lbl_ms)
         layout.addWidget(slider_speed)
-        layout.addWidget(btn_start)
+        layout.addWidget(self.btn_start)
         layout.addStretch()
+        layout.addWidget(btn_open)
+        layout.addWidget(btn_save)
 
         self.setLayout(layout)
+
+    def changeRows(self, x):
+        self.view.runEvo(False)
+        self.view.changeRows(x)
+        self.btn_start.setChecked(False)
+
+    def changeColumns(self, x):
+        self.view.runEvo(False)
+        self.view.changeColumns(x)
+        self.btn_start.setChecked(False)
+
+    def clear(self):
+        self.view.runEvo(False)
+        self.view.reset()
+        self.btn_start.setChecked(False)
+
+    def randomize(self):
+        self.view.runEvo(False)
+        self.view.randomize()
+        self.btn_start.setChecked(False)
+
+    def openFile(self):
+        filename = QFileDialog.getOpenFileName(caption="Open File", filter="*.json")[0]
+        with open(filename, "r") as read_file:
+            data = json.load(read_file)
+        self.spinbox_columns.setValue(data["width"])
+        self.spinbox_rows.setValue(data["height"])
+        self.view.fromJson(filename)
+
+    def saveFile(self):
+        filename = QFileDialog.getSaveFileName(caption="Save File", filter="*.json")[0]
+        self.view.toJson(filename)
 
 
 class MainWindow(QMainWindow):
