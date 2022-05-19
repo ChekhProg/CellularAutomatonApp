@@ -15,10 +15,15 @@ class GameOfLifeWithAge(GameOfLife):
         else:
             self.cells = np.array(cells)
         #self.colors = {0: Qt.GlobalColor.black, 1: QColor.fromHsv(120, 255, 230), 2: QColor.fromHsv(120, 255, 200), 3: QColor.fromHsv(120, 255, 120)}
-        self.colors = {0: Qt.GlobalColor.black, 1: Qt.GlobalColor.yellow, 2: Qt.GlobalColor.darkYellow,
-                       3: Qt.GlobalColor.darkRed}
+        #self.colors = {0: Qt.GlobalColor.black, 1: Qt.GlobalColor.yellow, 2: Qt.GlobalColor.darkYellow,
+        #               3: Qt.GlobalColor.darkRed}
         # self.colors = {0: Qt.GlobalColor.black, 1: Qt.GlobalColor.red, 2: Qt.GlobalColor.darkRed,
-        #                3: Qt.GlobalColor.darkYellow}
+        #                3: Qt.GlobalColor.darkRed}
+        #self.colors = {0: Qt.GlobalColor.black, 1: QColor.fromHsl(48, 255, 128), 2: QColor.fromHsl(39, 255, 110), 3: QColor.fromHsl(25, 255, 110)}
+        #cl = [QColor.fromHsl(h, 255, 128) for h in range(50, 20, -3)]
+        #cl = [QColor.fromHsl(h, 255, 128) for h in range(100, 190, 2)]
+        cl = [QColor.fromHsl(h, 255, 128) for h in range(0, 240, 1)]
+        self.colors = [QColor.fromHsl(0, 0, 0)] + cl
 
     def set_random(self):
         for i in range(1, self.height - 1):
@@ -43,7 +48,7 @@ class GameOfLifeWithAge(GameOfLife):
                     else:
                         if cur_status == 0 and (neighbors in self.rule["B"]):
                             new_status = 1
-                    if new_status > 3: new_status = 3
+                    if new_status > len(self.colors) - 1: new_status = len(self.colors) - 1
                     new_cells[pos] = new_status
             self.cells = new_cells
 
