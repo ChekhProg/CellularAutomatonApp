@@ -4,18 +4,15 @@ import numpy as np
 from PyQt6.QtCore import Qt
 
 
-class GameOfLife:
-    def __init__(self, width, height, cells=None, rule=None):
-        if rule is None:
-            rule = {"B": [3], "S": [2, 3]}
-        self.rule = rule
+class GridSquare2DFlat:
+    def __init__(self, width, height, cells=None):
         self.width = width + 2
         self.height = height + 2
         if cells is None:
             self.cells = np.zeros((self.height * self.width), dtype=bool)
         else:
             self.cells = np.array(cells)
-        self.colors = {False: Qt.GlobalColor.black, True: Qt.GlobalColor.green}
+        self.colors = {False: Qt.GlobalColor.black, True: Qt.GlobalColor.darkGreen}
 
     def set_random(self):
         for i in range(1, self.height - 1):
@@ -48,10 +45,10 @@ class GameOfLife:
                     pos = i * self.width + j
                     cur_status = self.cells[pos]
                     new_status = False
-                    if cur_status and (neighbors in self.rule["S"]):
+                    if cur_status and (neighbors == 3 or neighbors == 2):
                         new_status = True
                     else:
-                        if not cur_status and (neighbors in self.rule["B"]):
+                        if neighbors == 3 and not cur_status:
                             new_status = True
                     new_cells[pos] = new_status
             self.cells = new_cells

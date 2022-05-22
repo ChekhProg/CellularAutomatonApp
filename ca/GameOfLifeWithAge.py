@@ -1,10 +1,9 @@
 import random
 
 import numpy as np
-from PyQt6.QtCore import Qt
 from PyQt6.QtGui import QColor
 
-from GameOfLife import GameOfLife
+from ca.GameOfLife import GameOfLife
 
 
 class GameOfLifeWithAge(GameOfLife):
@@ -68,10 +67,12 @@ class GameOfLifeWithAge(GameOfLife):
         if self.cells[pos + self.width + 1] > 0: live_neighbors += 1
         return live_neighbors
 
-    def changeCellStatus(self, i, j):
+    def changeCellStatus(self, i, j, state=None):
         pos = (i + 1) * self.width + (j + 1)
         new_state = 1
         if self.cells[pos] == 1:
+            new_state = 0
+        if not state is None:
             new_state = 0
         self.cells[pos] = new_state
         return new_state
