@@ -3,7 +3,6 @@ import time
 
 import numpy as np
 from PyQt6.QtCore import QTimer
-from PyQt6.QtGui import QBrush
 from PyQt6.QtWidgets import QGraphicsView, QGraphicsScene, QSizePolicy
 
 from ca.BriansBrain import BriansBrain
@@ -38,8 +37,6 @@ class UniverseView(QGraphicsView):
         self.initCellsView()
         self.redrawUniverse()
 
-        # self.main_widget.centralWidget().setFixedSize(self.main_widget.centralWidget().sizeHint())
-        # self.main_widget.setFixedSize(self.main_widget.sizeHint())
         self.setSizePolicy(QSizePolicy.Policy.Fixed, QSizePolicy.Policy.Fixed)
         self.setScene(self.scene)
 
@@ -66,39 +63,30 @@ class UniverseView(QGraphicsView):
                 cells[pos] = cell
                 self.scene.addItem(cell)
         self.cells = cells
-        self.universe_prev_cells = np.copy(self.universe.cells) #####
+        self.universe_prev_cells = None
         self.redrawUniverse()
 
-    def setCellViewColor(self, x, y, color, state):
+    def setCellViewColor(self, x, y, color):
         pos = y * self.columns + x
-        # if self.cells[pos].state != state:
-        #     self.cells[pos].state = state
-        #     self.cells[pos].setBrush(color)
         self.cells[pos].setBrush(color)
 
-    # def redrawUniverse(self):
-    #     alltime = 0
-    #     for i in range(self.rows):
-    #         for j in range(self.columns):
-    #             x = j
-    #             y = i
-    #             state = self.universe.getCellStatus(i, j)
-    #             stime = time.time()
-    #             self.setCellViewColor(x, y, self.universe.colors[state], state)
-    #             alltime += time.time() - stime
-    #
-    #     print(alltime)
-
     def redrawUniverse(self):
-        v = self.universe_prev_cells != self.universe.cells
-        diff_ind = np.argwhere(self.universe_prev_cells != self.universe.cells)
-        for k in diff_ind:
-            pos = k[0]
-            i = pos // (self.columns + 2)
-            j = pos - ((self.columns + 2) * i)
-            state = self.universe.cells[pos]
-            color = self.universe.colors[state]
-            self.setCellViewColor(j-1, i-1, color, state)
+        b = self.universe.cells.reshape((self.rows + 2, self.columns + 2))[1:self.rows + 1, 1:self.columns + 1]
+        if self.universe_prev_cells is None:
+            for i in range(self.rows):
+                for j in range(self.columns):
+                    state = self.universe.getCellStatus(i, j)
+                    color = self.universe.colors[state]
+                    self.setCellViewColor(j, i, color)
+        else:
+            a = self.universe_prev_cells.reshape((self.rows+2, self.columns+2))[1:self.rows+1, 1:self.columns+1]
+            diff_ind = np.argwhere(a != b)
+            for k in diff_ind:
+                i = k[0]
+                j = k[1]
+                state = self.universe.getCellStatus(i, j)
+                color = self.universe.colors[state]
+                self.setCellViewColor(j, i, color)
         self.universe_prev_cells = np.copy(self.universe.cells)
 
     def step(self, n=1, btn=None):
@@ -145,7 +133,6 @@ class UniverseView(QGraphicsView):
         self.scene = QGraphicsScene(0, 0, self.columns * size, self.rows * size)
         self.initCellsView()
         self.setScene(self.scene)
-        #self.main_widget.centralWidget().setFixedSize(self.main_widget.centralWidget().sizeHint())
         self.main_widget.setFixedSize(self.main_widget.sizeHint())
         self.redrawUniverse()
 

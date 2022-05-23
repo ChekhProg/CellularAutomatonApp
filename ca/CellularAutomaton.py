@@ -2,7 +2,6 @@ import abc
 import random
 
 import numpy as np
-from PyQt6.QtCore import Qt
 
 from abc import *
 

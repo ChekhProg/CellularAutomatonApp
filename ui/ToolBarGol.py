@@ -39,7 +39,7 @@ class ToolBarGol(QWidget):
         # Rows Horizontal Layout
         lbl_rows = QLabel("Rows: ")
         self.spinbox_rows = QSpinBox()
-        self.spinbox_rows.setRange(40, 100)
+        self.spinbox_rows.setRange(40, 150)
         self.spinbox_rows.setValue(view.rows)
         self.spinbox_rows.valueChanged.connect(lambda x: self.changeRows(x))
 
@@ -51,7 +51,7 @@ class ToolBarGol(QWidget):
         # Rows Horizontal Layout
         lbl_columns = QLabel("Columns: ")
         self.spinbox_columns = QSpinBox()
-        self.spinbox_columns.setRange(40, 100)
+        self.spinbox_columns.setRange(40, 150)
         self.spinbox_columns.setValue(view.columns)
         self.spinbox_columns.valueChanged.connect(lambda x: self.changeColumns(x))
 
@@ -63,7 +63,7 @@ class ToolBarGol(QWidget):
         # Size Horizontal Layout
         lbl_size = QLabel("Size: ")
         spinbox_steps = QSpinBox()
-        spinbox_steps.setRange(5, 13)
+        spinbox_steps.setRange(4, 13)
         spinbox_steps.setValue(view.size)
         spinbox_steps.lineEdit().setDisabled(True)
         spinbox_steps.valueChanged.connect(lambda s: view.changeSize(s))

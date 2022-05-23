@@ -10,7 +10,6 @@ class SelectionWindow(QWidget):
         vbox = QVBoxLayout()
         vbox.setSpacing(20)
         self.setFixedWidth(200)
-        # self.setFixedHeight(self.sizeHint().height())
 
         btn_Gof = QPushButton("Game Of Life")
         btn_Gof.clicked.connect(self.selectGof)

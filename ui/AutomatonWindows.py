@@ -1,12 +1,3 @@
-from PyQt6.QtGui import QSurfaceFormat
-from PyQt6.QtOpenGLWidgets import QOpenGLWidget
-from PyQt6.QtWidgets import QWidget, \
-    QHBoxLayout, QLayout
-
-from ui.ToolBar import ToolBar
-from ui.ToolBarGol import ToolBarGol
-from ui.ToolBarWireworld import ToolBarWireworld
-from ui.UniverseView import UniverseView
 from PyQt6.QtWidgets import QWidget, \
     QHBoxLayout, QLayout
 
@@ -23,13 +14,6 @@ class GolWindow(QWidget):
 
         self.view = UniverseView(self, "GameOfLife")
         self.tools = ToolBarGol(self.view, selection_window)
-
-        gl = QOpenGLWidget()
-
-        form = QSurfaceFormat()
-        form.setSamples(4)
-        gl.setFormat(form)
-        self.view.setViewport(gl)
 
         hbox = QHBoxLayout(self)
         hbox.setSizeConstraint(QLayout.SizeConstraint.SetMaximumSize)

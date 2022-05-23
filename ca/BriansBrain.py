@@ -1,13 +1,15 @@
 import numpy as np
 from PyQt6.QtCore import Qt
 
-from ca.GameOfLifeWithAge import GameOfLifeWithAge
+from ca.CellularAutomaton import CellularAutomaton
 
 
-class BriansBrain(GameOfLifeWithAge):
+class BriansBrain(CellularAutomaton):
     def __init__(self, width, height, cells=None):
-        super().__init__(width, height, cells, None)
+        super().__init__(width, height, cells)
         self.colors = [Qt.GlobalColor.black, Qt.GlobalColor.white, Qt.GlobalColor.red]
+        self.init_states = [0, 1]
+        self.changeable_states = [0, 1, 2]
 
     def get_neighbors_moore(self, i, j):
         pos = i * self.width + j
@@ -41,15 +43,3 @@ class BriansBrain(GameOfLifeWithAge):
 
         for k in range(n):
             gen()
-
-    def changeCellStatus(self, i, j, state=None):
-        pos = (i + 1) * self.width + (j + 1)
-        new_state = 0
-        if self.cells[pos] == 0:
-            new_state = 1
-        elif self.cells[pos] == 1:
-            new_state = 2
-        if not state is None:
-            new_state = 0
-        self.cells[pos] = new_state
-        return new_state
