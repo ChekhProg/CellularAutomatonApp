@@ -11,7 +11,7 @@ class BriansBrain(CellularAutomaton):
         self.init_states = [0, 1]
         self.changeable_states = [0, 1, 2]
 
-    def get_neighbors_moore(self, i, j):
+    def getNeighborsMoore(self, i, j):
         pos = i * self.width + j
         live_neighbors: int = 0
         if self.cells[pos - self.width - 1] == 1: live_neighbors += 1
@@ -24,12 +24,12 @@ class BriansBrain(CellularAutomaton):
         if self.cells[pos + self.width + 1] == 1: live_neighbors += 1
         return live_neighbors
 
-    def next_gen(self, n=1):
+    def nextGen(self, n=1):
         def gen():
             new_cells = np.zeros((self.height * self.width), dtype=int)
             for i in range(1, self.height - 1):
                 for j in range(1, self.width - 1):
-                    neighbors = self.get_neighbors_moore(i, j)
+                    neighbors = self.getNeighborsMoore(i, j)
                     pos = i * self.width + j
                     cur_status = self.cells[pos]
                     new_status = 0

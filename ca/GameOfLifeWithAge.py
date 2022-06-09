@@ -1,5 +1,3 @@
-import random
-
 import numpy as np
 from PyQt6.QtGui import QColor
 
@@ -15,22 +13,18 @@ class GameOfLifeWithAge(GameOfLife):
             self.cells = np.array(cells)
         cl = [QColor.fromHsl(h, 255, 128) for h in range(0, 240, 1)]
         self.colors = [QColor.fromHsl(0, 0, 0)] + cl
-
-    def set_random(self):
-        for i in range(1, self.height - 1):
-            for j in range(1, self.width - 1):
-                pos = i * self.width + j
-                self.cells[pos] = random.choice([0, 1])
+        self.init_states = [0, 1]
+        self.changeable_states = [0, 1]
 
     def clear(self):
         self.cells = np.zeros((self.height * self.width), dtype=int)
 
-    def next_gen(self, n=1):
+    def nextGen(self, n=1):
         def gen():
             new_cells = np.zeros((self.height * self.width), dtype=int)
             for i in range(1, self.height - 1):
                 for j in range(1, self.width - 1):
-                    neighbors = self.get_neighbors_moore(i, j)
+                    neighbors = self.getNeighborsMoore(i, j)
                     pos = i * self.width + j
                     cur_status = self.cells[pos]
                     new_status = 0
@@ -46,25 +40,15 @@ class GameOfLifeWithAge(GameOfLife):
         for k in range(n):
             gen()
 
-    def get_neighbors_moore(self, i, j):
+    def getNeighborsMoore(self, i, j):
         pos = i * self.width + j
         live_neighbors: int = 0
-        if self.cells[pos - self.width - 1] > 0 : live_neighbors += 1
+        if self.cells[pos - self.width - 1] > 0: live_neighbors += 1
         if self.cells[pos - self.width] > 0: live_neighbors += 1
-        if self.cells[pos - self.width + 1] > 0 : live_neighbors += 1
+        if self.cells[pos - self.width + 1] > 0: live_neighbors += 1
         if self.cells[pos - 1] > 0: live_neighbors += 1
         if self.cells[pos + 1] > 0: live_neighbors += 1
         if self.cells[pos + self.width - 1] > 0: live_neighbors += 1
         if self.cells[pos + self.width] > 0: live_neighbors += 1
         if self.cells[pos + self.width + 1] > 0: live_neighbors += 1
         return live_neighbors
-
-    def changeCellStatus(self, i, j, state=None):
-        pos = (i + 1) * self.width + (j + 1)
-        new_state = 1
-        if self.cells[pos] == 1:
-            new_state = 0
-        if not state is None:
-            new_state = 0
-        self.cells[pos] = new_state
-        return new_state

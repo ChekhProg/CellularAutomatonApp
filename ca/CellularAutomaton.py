@@ -20,7 +20,7 @@ class CellularAutomaton:
         else:
             self.cells = np.array(cells)
 
-    def set_random(self):
+    def setRandom(self):
         for i in range(1, self.height - 1):
             for j in range(1, self.width - 1):
                 pos = i * self.width + j
@@ -30,18 +30,18 @@ class CellularAutomaton:
         self.cells = np.zeros((self.height * self.width), dtype=int)
 
     @abstractmethod
-    def get_neighbors_moore(self, i, j):
+    def getNeighborsMoore(self, i, j):
         pass
 
     @abstractmethod
-    def next_gen(self, n):
+    def nextGen(self, n):
         pass
 
-    def getCellStatus(self, i, j):
+    def getCellState(self, i, j):
         pos = (i + 1) * self.width + (j + 1)
         return self.cells[pos]
 
-    def changeCellStatus(self, i, j, state=None):
+    def changeCellState(self, i, j, state=None):
         pos = (i + 1) * self.width + (j + 1)
         if state is None:
             cur_state = self.cells[pos]

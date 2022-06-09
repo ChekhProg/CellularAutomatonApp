@@ -35,7 +35,7 @@ class ToolBarWireworld(QWidget):
         # Rows Horizontal Layout
         lbl_rows = QLabel("Rows: ")
         self.spinbox_rows = QSpinBox()
-        self.spinbox_rows.setRange(40, 100)
+        self.spinbox_rows.setRange(25, 100)
         self.spinbox_rows.setValue(view.rows)
         self.spinbox_rows.valueChanged.connect(lambda x: self.changeRows(x))
 
@@ -47,7 +47,7 @@ class ToolBarWireworld(QWidget):
         # Rows Horizontal Layout
         lbl_columns = QLabel("Columns: ")
         self.spinbox_columns = QSpinBox()
-        self.spinbox_columns.setRange(40, 100)
+        self.spinbox_columns.setRange(25, 100)
         self.spinbox_columns.setValue(view.columns)
         self.spinbox_columns.valueChanged.connect(lambda x: self.changeColumns(x))
 

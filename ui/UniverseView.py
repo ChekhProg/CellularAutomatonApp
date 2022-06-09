@@ -52,12 +52,13 @@ class UniverseView(QGraphicsView):
         self.universe_prev_cells = None
 
     def initCellsView(self):
+        self.scene.clear()
         cells = np.zeros((self.rows * self.columns), dtype=object)
         for i in range(self.rows):
             for j in range(self.columns):
                 x = j
                 y = i
-                cell = CellView(self.universe, self.size, x, y, 0)
+                cell = CellView(self.universe, self.size, x, y)
                 cell.setPos(x * self.size, y * self.size)
                 pos = y * self.columns + x
                 cells[pos] = cell
@@ -66,33 +67,35 @@ class UniverseView(QGraphicsView):
         self.universe_prev_cells = None
         self.redrawUniverse()
 
-    def setCellViewColor(self, x, y, color):
-        pos = y * self.columns + x
+    def setCellViewColor(self, i, j, color):
+        pos = i * self.columns + j
         self.cells[pos].setBrush(color)
 
     def redrawUniverse(self):
-        b = self.universe.cells.reshape((self.rows + 2, self.columns + 2))[1:self.rows + 1, 1:self.columns + 1]
         if self.universe_prev_cells is None:
             for i in range(self.rows):
                 for j in range(self.columns):
-                    state = self.universe.getCellStatus(i, j)
+                    state = self.universe.getCellState(i, j)
                     color = self.universe.colors[state]
-                    self.setCellViewColor(j, i, color)
+                    self.setCellViewColor(i, j, color)
         else:
-            a = self.universe_prev_cells.reshape((self.rows+2, self.columns+2))[1:self.rows+1, 1:self.columns+1]
+            b = self.universe.cells.reshape((self.rows + 2, self.columns + 2))
+            b = b[1:self.rows + 1, 1:self.columns + 1]
+            a = self.universe_prev_cells.reshape((self.rows+2, self.columns+2))
+            a = a[1:self.rows+1, 1:self.columns+1]
             diff_ind = np.argwhere(a != b)
             for k in diff_ind:
                 i = k[0]
                 j = k[1]
-                state = self.universe.getCellStatus(i, j)
+                state = self.universe.getCellState(i, j)
                 color = self.universe.colors[state]
-                self.setCellViewColor(j, i, color)
+                self.setCellViewColor(i, j, color)
         self.universe_prev_cells = np.copy(self.universe.cells)
 
     def step(self, n=1, btn=None):
         self.universe_prev_cells = np.copy(self.universe.cells)
         stime = time.time()
-        self.universe.next_gen(n)
+        self.universe.nextGen(n)
         etime_calc = time.time() - stime
         self.redrawUniverse()
         if not btn is None:
@@ -105,7 +108,7 @@ class UniverseView(QGraphicsView):
         self.redrawUniverse()
 
     def randomize(self):
-        self.universe.set_random()
+        self.universe.setRandom()
         self.redrawUniverse()
 
     def runEvo(self, check):
@@ -137,8 +140,8 @@ class UniverseView(QGraphicsView):
         self.redrawUniverse()
 
     def toJson(self, filename):
-        cells = map(lambda x: int(x), self.universe.cells)
-        data = {"width": self.columns, "height": self.rows, "cells": list(cells)}
+        cells = list(map(lambda x: int(x), self.universe.cells))
+        data = {"width": self.columns, "height": self.rows, "cells": cells}
         with open(filename, "w") as write_file:
             json.dump(data, write_file)
 
@@ -147,8 +150,11 @@ class UniverseView(QGraphicsView):
             data = json.load(read_file)
         self.columns = data["width"]
         self.rows = data["height"]
-        cells = list(map(lambda x: bool(x), data["cells"]))
+        if self.type == "GameOfLife":
+            cells = list(map(lambda x: bool(x), data["cells"]))
+        else:
+            cells = list(map(lambda x: int(x), data["cells"]))
         self.initUniverse(cells=cells)
-        self.initCellsView()
         self.changeSize(self.size)
+        self.initCellsView()
         self.redrawUniverse()

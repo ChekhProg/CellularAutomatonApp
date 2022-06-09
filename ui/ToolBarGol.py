@@ -7,7 +7,6 @@ from PyQt6.QtWidgets import QWidget, QVBoxLayout, QPushButton, QLabel, QSlider, 
     QLineEdit, QRadioButton, QCheckBox, QFileDialog
 
 
-
 class ToolBarGol(QWidget):
     def __init__(self, view, selection_window):
         super().__init__()
@@ -39,7 +38,7 @@ class ToolBarGol(QWidget):
         # Rows Horizontal Layout
         lbl_rows = QLabel("Rows: ")
         self.spinbox_rows = QSpinBox()
-        self.spinbox_rows.setRange(40, 150)
+        self.spinbox_rows.setRange(10, 150)
         self.spinbox_rows.setValue(view.rows)
         self.spinbox_rows.valueChanged.connect(lambda x: self.changeRows(x))
 
@@ -51,7 +50,7 @@ class ToolBarGol(QWidget):
         # Rows Horizontal Layout
         lbl_columns = QLabel("Columns: ")
         self.spinbox_columns = QSpinBox()
-        self.spinbox_columns.setRange(40, 150)
+        self.spinbox_columns.setRange(10, 150)
         self.spinbox_columns.setValue(view.columns)
         self.spinbox_columns.valueChanged.connect(lambda x: self.changeColumns(x))
 
@@ -271,6 +270,7 @@ class ToolBarGol(QWidget):
                 return 1
             else:
                 return 0
+
         self.view.runEvo(False)
         self.btn_start.setChecked(False)
         if s:

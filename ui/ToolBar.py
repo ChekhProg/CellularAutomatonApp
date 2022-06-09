@@ -67,8 +67,8 @@ class ToolBar(QWidget):
         self.size_layout = QHBoxLayout()
         self.size_layout.addWidget(lbl_size)
         self.size_layout.addWidget(spinbox_steps)
+        # End Size Horizontal Layout
 
-        # Size Step Layout
         self.btn_clear = QPushButton("Clear")
         self.btn_clear.clicked.connect(lambda: self.clear())
 
@@ -130,13 +130,13 @@ class ToolBar(QWidget):
 
     def clear(self):
         self.view.runEvo(False)
-        self.view.reset()
         self.btn_start.setChecked(False)
+        self.view.reset()
 
     def randomize(self):
         self.view.runEvo(False)
-        self.view.randomize()
         self.btn_start.setChecked(False)
+        self.view.randomize()
 
     def openFile(self):
         self.view.runEvo(False)

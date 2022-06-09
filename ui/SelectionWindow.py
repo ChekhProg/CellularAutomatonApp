@@ -9,7 +9,8 @@ class SelectionWindow(QWidget):
         self.setWindowTitle("Cellular Automaton")
         vbox = QVBoxLayout()
         vbox.setSpacing(20)
-        self.setFixedWidth(200)
+        # self.setFixedWidth(200)
+        self.setFixedWidth(280)
 
         btn_Gof = QPushButton("Game Of Life")
         btn_Gof.clicked.connect(self.selectGof)
