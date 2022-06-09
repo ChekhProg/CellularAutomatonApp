@@ -4,18 +4,20 @@ from PyQt6.QtWidgets import QGraphicsRectItem
 
 
 class CellView(QGraphicsRectItem):
-    def __init__(self, universe, size, x, y):
+    def __init__(self, drawer_state, universe, size, x, y):
         super().__init__(0, 0, size, size)
         self.x = x
         self.y = y
         self.universe = universe
+        self.view = drawer_state
 
     def mousePressEvent(self, e):
         if e.button() == Qt.MouseButton.LeftButton:
             i = self.y
             j = self.x
-            new_state = self.universe.changeCellState(i, j)
-            print("x: {}, y: {}, state: {}".format(self.x, self.y, new_state))
+            #new_state = self.universe.changeCellState(i, j)
+            new_state = self.universe.changeCellState(i, j, self.view.drawer_state)
+            #print("x: {}, y: {}, state: {}".format(self.x, self.y, new_state))
             brush = QBrush(self.universe.colors[new_state])
             self.setBrush(brush)
         elif e.button() == Qt.MouseButton.RightButton:

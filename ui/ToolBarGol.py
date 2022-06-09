@@ -1,10 +1,10 @@
 import json
 
 import numpy as np
-from PyQt6.QtCore import QRegularExpression, Qt
+from PyQt6.QtCore import QRegularExpression, Qt, QSize
 from PyQt6.QtGui import QRegularExpressionValidator
 from PyQt6.QtWidgets import QWidget, QVBoxLayout, QPushButton, QLabel, QSlider, QHBoxLayout, QSpinBox, QComboBox, \
-    QLineEdit, QRadioButton, QCheckBox, QFileDialog
+    QLineEdit, QRadioButton, QCheckBox, QFileDialog, QGridLayout, QLayout
 
 
 class ToolBarGol(QWidget):
@@ -24,7 +24,7 @@ class ToolBarGol(QWidget):
         lbl_ms = QLabel()
 
         slider_speed = QSlider(Qt.Orientation.Horizontal)
-        slider_speed.setRange(2, 25)
+        slider_speed.setRange(2, 60)
         slider_speed.setSliderPosition(10)
         view.timer.setInterval(1000 // slider_speed.value())
         slider_speed.valueChanged.connect(lambda i: view.changeSpeed(i))
@@ -128,6 +128,30 @@ class ToolBarGol(QWidget):
         rule_layout.addLayout(rule_custom_layout)
         # End Rule Layout
 
+        # State Layout
+        state_widget = QWidget()
+        state_label = QLabel("Cell drawer state:")
+        self.state_btns = []
+        btn_0 = QPushButton("0")
+        btn_0.setCheckable(True)
+        btn_0.setFixedSize(QSize(25, 25))
+        btn_0.clicked.connect(lambda e: self.changeDrawerState(e, 0))
+        btn_0.setStyleSheet("background-color: black; color: white")
+        btn_0.click()
+        self.state_btns.append(btn_0)
+        btn_1 = QPushButton("1")
+        btn_1.setCheckable(True)
+        btn_1.setFixedSize(QSize(25, 25))
+        btn_1.clicked.connect(lambda e: self.changeDrawerState(e, 1))
+        btn_1.setStyleSheet("background-color: rgb(0,255,0); color: black")
+        self.state_btns.append(btn_1)
+        state_layout = QGridLayout()
+        state_layout.addWidget(btn_0, 0, 0)
+        state_layout.addWidget(btn_1, 0, 1)
+        state_layout.setSizeConstraint(QLayout.SizeConstraint.SetMaximumSize)
+        state_widget.setLayout(state_layout)
+        # End State Layout
+
         # Age Layout
         age_layout = QHBoxLayout()
         checkbox_age = QCheckBox("With Age")
@@ -178,6 +202,8 @@ class ToolBarGol(QWidget):
         layout.addWidget(lbl_ms)
         layout.addWidget(slider_speed)
         layout.addWidget(self.btn_start)
+        layout.addWidget(state_label)
+        layout.addWidget(state_widget)
         layout.addStretch()
         layout.addWidget(btn_type)
         layout.addStretch()
@@ -274,12 +300,14 @@ class ToolBarGol(QWidget):
         self.view.runEvo(False)
         self.btn_start.setChecked(False)
         if s:
+            self.state_btns[1].setStyleSheet("background-color: rgb(255,0,0); color: black")
             cells = np.vectorize(mappingFromBool)(self.view.universe.cells).astype(int)
             self.view.type = "GameOfLifeWithAge"
             self.view.initUniverse(cells=cells)
             self.view.initCellsView()
             self.view.redrawUniverse()
         else:
+            self.state_btns[1].setStyleSheet("background-color: rgb(0,255,0); color: black")
             cells = np.vectorize(mappingToBool)(self.view.universe.cells).astype(bool)
             self.view.type = "GameOfLife"
             self.view.initUniverse(cells=cells)
@@ -291,3 +319,12 @@ class ToolBarGol(QWidget):
         self.btn_start.setChecked(False)
         self.selection_window.show()
         self.parent().close()
+
+    def changeDrawerState(self, e, btn_ind):
+        if e:
+            self.view.drawer_state = btn_ind
+            for i, b in enumerate(self.state_btns):
+                if not i == btn_ind:
+                    b.setChecked(False)
+        else:
+            self.state_btns[btn_ind].setChecked(True)

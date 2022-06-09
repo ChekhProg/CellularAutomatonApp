@@ -1,6 +1,6 @@
 from PyQt6.QtWidgets import QPushButton, QWidget, QVBoxLayout
 
-from ui.AutomatonWindows import GolWindow, BriansBrainWindow, WireworldWindow
+from ui.AutomatonWindows import GolWindow, BriansBrainWindow, WireworldWindow, VonNeumannWindow
 
 
 class SelectionWindow(QWidget):
@@ -21,9 +21,13 @@ class SelectionWindow(QWidget):
         btn_Ww = QPushButton("Wireworld")
         btn_Ww.clicked.connect(self.selectWw)
 
+        btn_Vn = QPushButton("Von Neumann Automaton")
+        btn_Vn.clicked.connect(self.selectVn)
+
         vbox.addWidget(btn_Gof)
         vbox.addWidget(btn_Bb)
         vbox.addWidget(btn_Ww)
+        vbox.addWidget(btn_Vn)
 
         self.setLayout(vbox)
 
@@ -40,4 +44,9 @@ class SelectionWindow(QWidget):
     def selectWw(self):
         self.hide()
         w = WireworldWindow(self)
+        w.show()
+
+    def selectVn(self):
+        self.hide()
+        w = VonNeumannWindow(self)
         w.show()

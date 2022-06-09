@@ -8,6 +8,7 @@ from PyQt6.QtWidgets import QGraphicsView, QGraphicsScene, QSizePolicy
 from ca.BriansBrain import BriansBrain
 from ca.GameOfLife import GameOfLife
 from ca.GameOfLifeWithAge import GameOfLifeWithAge
+from ca.VonNeumann import VonNeumann
 from ca.Wireworld import Wireworld
 from ui.CellView import CellView
 
@@ -16,6 +17,7 @@ class UniverseView(QGraphicsView):
     def __init__(self, main_widget, type):
         super().__init__()
         self.universe_prev_cells = None
+        self.drawer_state = None
         self.cells = None
         self.universe = None
         self.type = type
@@ -49,6 +51,8 @@ class UniverseView(QGraphicsView):
             self.universe = BriansBrain(self.columns, self.rows, cells=cells)
         elif self.type == "Wireworld":
             self.universe = Wireworld(self.columns, self.rows, cells=cells)
+        elif self.type == "VonNeumann":
+            self.universe = VonNeumann(self.columns, self.rows, cells=cells)
         self.universe_prev_cells = None
 
     def initCellsView(self):
@@ -58,7 +62,7 @@ class UniverseView(QGraphicsView):
             for j in range(self.columns):
                 x = j
                 y = i
-                cell = CellView(self.universe, self.size, x, y)
+                cell = CellView(self, self.universe, self.size, x, y)
                 cell.setPos(x * self.size, y * self.size)
                 pos = y * self.columns + x
                 cells[pos] = cell

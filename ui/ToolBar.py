@@ -1,7 +1,8 @@
 import json
 
-from PyQt6.QtCore import Qt
-from PyQt6.QtWidgets import QWidget, QVBoxLayout, QPushButton, QLabel, QSlider, QHBoxLayout, QSpinBox, QFileDialog
+from PyQt6.QtCore import Qt, QSize
+from PyQt6.QtWidgets import QWidget, QVBoxLayout, QPushButton, QLabel, QSlider, QHBoxLayout, QSpinBox, QFileDialog, \
+    QGridLayout, QLayout
 
 
 class ToolBar(QWidget):
@@ -21,7 +22,7 @@ class ToolBar(QWidget):
         self.lbl_ms = QLabel()
 
         self.slider_speed = QSlider(Qt.Orientation.Horizontal)
-        self.slider_speed.setRange(2, 25)
+        self.slider_speed.setRange(2, 60)
         self.slider_speed.setSliderPosition(10)
         view.timer.setInterval(1000 // self.slider_speed.value())
         self.slider_speed.valueChanged.connect(lambda i: view.changeSpeed(i))
@@ -97,6 +98,39 @@ class ToolBar(QWidget):
         self.btn_save.clicked.connect(lambda: self.saveFile())
         # End Save
 
+        # State Layout
+        state_widget = QWidget()
+        state_label = QLabel("Cell drawer state:")
+        self.state_btns = []
+        btn_0 = QPushButton("0")
+        btn_0.setCheckable(True)
+        btn_0.setFixedSize(QSize(25, 25))
+        btn_0.clicked.connect(lambda e: self.changeDrawerState(e, 0))
+        btn_0.setStyleSheet("background-color: black; color: white")
+        btn_0.click()
+        self.state_btns.append(btn_0)
+        btn_1 = QPushButton("1")
+        btn_1.setCheckable(True)
+        btn_1.setFixedSize(QSize(25, 25))
+        btn_1.clicked.connect(lambda e: self.changeDrawerState(e, 1))
+        btn_1.setStyleSheet("background-color: rgb(255,255,255); color: black")
+        self.state_btns.append(btn_1)
+
+        btn_2 = QPushButton("2")
+        btn_2.setCheckable(True)
+        btn_2.setFixedSize(QSize(25, 25))
+        btn_2.clicked.connect(lambda e: self.changeDrawerState(e, 2))
+        btn_2.setStyleSheet("background-color: rgb(255,0,0); color: black")
+        self.state_btns.append(btn_2)
+
+        state_layout = QGridLayout()
+        state_layout.addWidget(btn_0, 0, 0)
+        state_layout.addWidget(btn_1, 0, 1)
+        state_layout.addWidget(btn_2, 0, 2)
+        state_layout.setSizeConstraint(QLayout.SizeConstraint.SetMaximumSize)
+        state_widget.setLayout(state_layout)
+        # End State Layout
+
         btn_type = QPushButton("Choose Automaton Type")
         btn_type.clicked.connect(lambda: self.changeType())
 
@@ -110,6 +144,8 @@ class ToolBar(QWidget):
         layout.addWidget(self.lbl_ms)
         layout.addWidget(self.slider_speed)
         layout.addWidget(self.btn_start)
+        layout.addWidget(state_label)
+        layout.addWidget(state_widget)
         layout.addStretch()
         layout.addWidget(btn_type)
         layout.addStretch()
@@ -161,3 +197,12 @@ class ToolBar(QWidget):
         self.btn_start.setChecked(False)
         self.selection_window.show()
         self.parent().close()
+
+    def changeDrawerState(self, e, btn_ind):
+        if e:
+            self.view.drawer_state = btn_ind
+            for i, b in enumerate(self.state_btns):
+                if not i == btn_ind:
+                    b.setChecked(False)
+        else:
+            self.state_btns[btn_ind].setChecked(True)

@@ -1,7 +1,8 @@
 import json
 
-from PyQt6.QtCore import Qt
-from PyQt6.QtWidgets import QWidget, QVBoxLayout, QPushButton, QLabel, QSlider, QHBoxLayout, QSpinBox, QFileDialog
+from PyQt6.QtCore import Qt, QSize
+from PyQt6.QtWidgets import QWidget, QVBoxLayout, QPushButton, QLabel, QSlider, QHBoxLayout, QSpinBox, QFileDialog, \
+    QGridLayout, QLayout
 
 
 class ToolBarWireworld(QWidget):
@@ -21,7 +22,7 @@ class ToolBarWireworld(QWidget):
         self.lbl_ms = QLabel()
 
         self.slider_speed = QSlider(Qt.Orientation.Horizontal)
-        self.slider_speed.setRange(2, 25)
+        self.slider_speed.setRange(2, 60)
         self.slider_speed.setSliderPosition(10)
         view.timer.setInterval(1000 // self.slider_speed.value())
         self.slider_speed.valueChanged.connect(lambda i: view.changeSpeed(i))
@@ -94,6 +95,45 @@ class ToolBarWireworld(QWidget):
         self.btn_save.clicked.connect(lambda: self.saveFile())
         # End Save
 
+        # State Layout
+        state_widget = QWidget()
+        state_label = QLabel("Cell drawer state:")
+        self.state_btns = []
+        btn_0 = QPushButton("E")
+        btn_0.setCheckable(True)
+        btn_0.setFixedSize(QSize(25, 25))
+        btn_0.clicked.connect(lambda e: self.changeDrawerState(e, 0))
+        btn_0.setStyleSheet("background-color: black; color: white")
+        btn_0.click()
+        self.state_btns.append(btn_0)
+        btn_1 = QPushButton("H")
+        btn_1.setCheckable(True)
+        btn_1.setFixedSize(QSize(25, 25))
+        btn_1.clicked.connect(lambda e: self.changeDrawerState(e, 1))
+        btn_1.setStyleSheet("background-color: hsl(250, 255, 128); color: black")
+        self.state_btns.append(btn_1)
+        btn_2 = QPushButton("T")
+        btn_2.setCheckable(True)
+        btn_2.setFixedSize(QSize(25, 25))
+        btn_2.clicked.connect(lambda e: self.changeDrawerState(e, 2))
+        btn_2.setStyleSheet("background-color: hsl(0, 255, 128); color: black")
+        self.state_btns.append(btn_2)
+        btn_3 = QPushButton("W")
+        btn_3.setCheckable(True)
+        btn_3.setFixedSize(QSize(25, 25))
+        btn_3.clicked.connect(lambda e: self.changeDrawerState(e, 3))
+        btn_3.setStyleSheet("background-color: hsl(50, 255, 128); color: black")
+        self.state_btns.append(btn_3)
+
+        state_layout = QGridLayout()
+        state_layout.addWidget(btn_0, 0, 0)
+        state_layout.addWidget(btn_1, 0, 1)
+        state_layout.addWidget(btn_2, 0, 2)
+        state_layout.addWidget(btn_3, 0, 3)
+        state_layout.setSizeConstraint(QLayout.SizeConstraint.SetMaximumSize)
+        state_widget.setLayout(state_layout)
+        # End State Layout
+
         btn_type = QPushButton("Choose Automaton Type")
         btn_type.clicked.connect(lambda: self.changeType())
 
@@ -106,6 +146,8 @@ class ToolBarWireworld(QWidget):
         layout.addWidget(self.lbl_ms)
         layout.addWidget(self.slider_speed)
         layout.addWidget(self.btn_start)
+        layout.addWidget(state_label)
+        layout.addWidget(state_widget)
         layout.addStretch()
         layout.addWidget(btn_type)
         layout.addStretch()
@@ -157,3 +199,12 @@ class ToolBarWireworld(QWidget):
         self.btn_start.setChecked(False)
         self.selection_window.show()
         self.parent().close()
+
+    def changeDrawerState(self, e, btn_ind):
+        if e:
+            self.view.drawer_state = btn_ind
+            for i, b in enumerate(self.state_btns):
+                if not i == btn_ind:
+                    b.setChecked(False)
+        else:
+            self.state_btns[btn_ind].setChecked(True)

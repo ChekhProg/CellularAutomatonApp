@@ -3,6 +3,7 @@ from PyQt6.QtWidgets import QWidget, \
 
 from ui.ToolBar import ToolBar
 from ui.ToolBarGol import ToolBarGol
+from ui.ToolBarJvN import ToolBarJvN
 from ui.ToolBarWireworld import ToolBarWireworld
 from ui.UniverseView import UniverseView
 
@@ -54,6 +55,26 @@ class WireworldWindow(QWidget):
         self.view.initCellsView()
         self.view.redrawUniverse()
         self.tools = ToolBarWireworld(self.view, selection_window)
+
+        hbox = QHBoxLayout(self)
+        hbox.setSizeConstraint(QLayout.SizeConstraint.SetMaximumSize)
+
+        hbox.addWidget(self.tools)
+        hbox.addWidget(self.view)
+
+        self.setLayout(hbox)
+        self.setFixedSize(self.sizeHint())
+
+
+class VonNeumannWindow(QWidget):
+    def __init__(self, selection_window):
+        super().__init__()
+        self.setWindowTitle("Von Neumann Automaton")
+
+        self.view = UniverseView(self, "VonNeumann")
+        self.view.initCellsView()
+        self.view.redrawUniverse()
+        self.tools = ToolBarJvN(self.view, selection_window)
 
         hbox = QHBoxLayout(self)
         hbox.setSizeConstraint(QLayout.SizeConstraint.SetMaximumSize)
