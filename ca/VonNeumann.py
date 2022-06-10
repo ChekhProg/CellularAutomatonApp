@@ -85,22 +85,37 @@ class VonNeumann(CellularAutomaton):
         if dir != "N" and self.cells[pos - self.width] == 18: ord_excited_neighbors += 1
         elif dir != "N" and self.cells[pos - self.width] == 14: ord_quiescent_neighbors += 1
 
-        flag = False
-        if ord_quiescent_neighbors == 0 and ord_excited_neighbors > 0:
-            flag = True
-        return flag
+        spec_quiescent_neighbors = 0
+        spec_excited_neighbors = 0
+        if dir != "W" and self.cells[pos - 1] == 28: spec_excited_neighbors += 1
+        elif dir != "W" and self.cells[pos - 1] == 14: spec_quiescent_neighbors += 1
+        if dir != "E" and self.cells[pos + 1] == 27: spec_excited_neighbors += 1
+        elif dir != "E" and self.cells[pos + 1] == 23: spec_quiescent_neighbors += 1
+        if dir != "S" and self.cells[pos + self.width] == 25: spec_excited_neighbors += 1
+        elif dir != "S" and self.cells[pos + self.width] == 21: spec_quiescent_neighbors += 1
+        if dir != "N" and self.cells[pos - self.width] == 26: spec_excited_neighbors += 1
+        elif dir != "N" and self.cells[pos - self.width] == 22: spec_quiescent_neighbors += 1
 
-    def getLiveConfluents(self, i, j, dir):
+        live_ord_neighbors = False
+        live_spec_neighbors = False
+        if ord_quiescent_neighbors == 0 and ord_excited_neighbors > 0:
+            live_ord_neighbors = True
+        if spec_quiescent_neighbors == 0 and spec_excited_neighbors > 0:
+            live_spec_neighbors = True
+        return live_ord_neighbors, live_spec_neighbors
+
+    def getLiveConfluent(self, i, j, dir):
         pos = i * self.width + j
         live_confluent_neighbors = 0
-        if dir != "W" and self.cells[pos - 1] == 11:
+        if dir != "W" and (self.cells[pos - 1] == 11 or self.cells[pos - 1] == 10):
             live_confluent_neighbors += 1
-        if dir != "E" and self.cells[pos + 1] == 11:
+        if dir != "E" and (self.cells[pos + 1] == 11 or self.cells[pos + 1] == 10):
             live_confluent_neighbors += 1
-        if dir != "S" and self.cells[pos + self.width] == 11:
+        if dir != "S" and (self.cells[pos + self.width] == 11 or self.cells[pos + self.width] == 10):
             live_confluent_neighbors += 1
-        if dir != "N" and self.cells[pos - self.width] == 11:
+        if dir != "N" and (self.cells[pos - self.width] == 11 or self.cells[pos - self.width] == 10):
             live_confluent_neighbors += 1
+        return live_confluent_neighbors > 0
 
     def nextGen(self, n=1):
         def gen():
@@ -114,33 +129,37 @@ class VonNeumann(CellularAutomaton):
                     # Ordinary Transmissions
                     if cur_state == 13 or cur_state == 17:
                         live_ord_neighbors, live_spec_neighbors = self.getNeighborsVonNeumannOr(i, j, "N")
+                        live_confluent = self.getLiveConfluent(i, j, "N")
                         if live_spec_neighbors:
                             new_state = 0
-                        elif live_ord_neighbors:
+                        elif live_ord_neighbors or live_confluent:
                             new_state = 17
                         else:
                             new_state = 13
                     if cur_state == 14 or cur_state == 18:
                         live_ord_neighbors, live_spec_neighbors = self.getNeighborsVonNeumannOr(i, j, "S")
+                        live_confluent = self.getLiveConfluent(i, j, "S")
                         if live_spec_neighbors:
                             new_state = 0
-                        elif live_ord_neighbors:
+                        elif live_ord_neighbors or live_confluent:
                             new_state = 18
                         else:
                             new_state = 14
                     if cur_state == 15 or cur_state == 19:
                         live_ord_neighbors, live_spec_neighbors = self.getNeighborsVonNeumannOr(i, j, "W")
+                        live_confluent = self.getLiveConfluent(i, j, "W")
                         if live_spec_neighbors:
                             new_state = 0
-                        elif live_ord_neighbors:
+                        elif live_ord_neighbors or live_confluent:
                             new_state = 19
                         else:
                             new_state = 15
                     if cur_state == 16 or cur_state == 20:
                         live_ord_neighbors, live_spec_neighbors = self.getNeighborsVonNeumannOr(i, j, "E")
+                        live_confluent = self.getLiveConfluent(i, j, "E")
                         if live_spec_neighbors:
                             new_state = 0
-                        elif live_ord_neighbors:
+                        elif live_ord_neighbors or live_confluent:
                             new_state = 20
                         else:
                             new_state = 16
@@ -148,54 +167,100 @@ class VonNeumann(CellularAutomaton):
                     # Special Transmission
                     if cur_state == 21 or cur_state == 25:
                         live_ord_neighbors, live_spec_neighbors = self.getNeighborsVonNeumannOr(i, j, "N")
+                        live_confluent = self.getLiveConfluent(i, j, "N")
                         if live_ord_neighbors:
                             new_state = 0
-                        elif live_spec_neighbors:
+                        elif live_spec_neighbors or live_confluent:
                             new_state = 25
                         else:
                             new_state = 21
                     if cur_state == 22 or cur_state == 26:
                         live_ord_neighbors, live_spec_neighbors = self.getNeighborsVonNeumannOr(i, j, "S")
+                        live_confluent = self.getLiveConfluent(i, j, "S")
                         if live_ord_neighbors:
                             new_state = 0
-                        elif live_spec_neighbors:
+                        elif live_spec_neighbors or live_confluent:
                             new_state = 26
                         else:
                             new_state = 22
                     if cur_state == 23 or cur_state == 27:
                         live_ord_neighbors, live_spec_neighbors = self.getNeighborsVonNeumannOr(i, j, "W")
+                        live_confluent = self.getLiveConfluent(i, j, "W")
                         if live_ord_neighbors:
                             new_state = 0
-                        elif live_spec_neighbors:
+                        elif live_spec_neighbors or live_confluent:
                             new_state = 27
                         else:
                             new_state = 23
                     if cur_state == 24 or cur_state == 28:
                         live_ord_neighbors, live_spec_neighbors = self.getNeighborsVonNeumannOr(i, j, "E")
+                        live_confluent = self.getLiveConfluent(i, j, "E")
                         if live_ord_neighbors:
                             new_state = 0
-                        elif live_spec_neighbors:
+                        elif live_spec_neighbors or live_confluent:
                             new_state = 28
                         else:
                             new_state = 24
 
                     # Confluent States
                     if cur_state == 9:
-                        live_ord_neighbors = self.getNeighborsVonNeumannAnd(i, j, "None")
-                        if live_ord_neighbors: new_state = 12
+                        live_ord_neighbors, live_spec_neighbors = self.getNeighborsVonNeumannAnd(i, j, "None")
+                        if live_spec_neighbors: new_state = 0
+                        elif live_ord_neighbors: new_state = 12
                         else: new_state = 9
                     if cur_state == 12:
-                        live_ord_neighbors = self.getNeighborsVonNeumannAnd(i, j, "None")
-                        if live_ord_neighbors: new_state = 10
+                        live_ord_neighbors, live_spec_neighbors = self.getNeighborsVonNeumannAnd(i, j, "None")
+                        if live_spec_neighbors: new_state = 0
+                        elif live_ord_neighbors: new_state = 10
                         else: new_state = 11
                     if cur_state == 11:
-                        live_ord_neighbors = self.getNeighborsVonNeumannAnd(i, j, "None")
-                        if live_ord_neighbors: new_state = 12
+                        live_ord_neighbors, live_spec_neighbors = self.getNeighborsVonNeumannAnd(i, j, "None")
+                        if live_spec_neighbors: new_state = 0
+                        elif live_ord_neighbors: new_state = 12
                         else: new_state = 9
                     if cur_state == 10:
-                        live_ord_neighbors = self.getNeighborsVonNeumannAnd(i, j, "None")
-                        if live_ord_neighbors: new_state = 12
-                        else: new_state = 12
+                        live_ord_neighbors, live_spec_neighbors = self.getNeighborsVonNeumannAnd(i, j, "None")
+                        if live_spec_neighbors: new_state = 0
+                        elif live_ord_neighbors: new_state = 10
+                        else: new_state = 11
+
+                    # Transition States
+                    if cur_state == 0:
+                        live_ord_neighbors, live_spec_neighbors = self.getNeighborsVonNeumannOr(i, j, "None")
+                        if live_ord_neighbors or live_spec_neighbors: new_state = 1
+                        else: new_state = 0
+                    if cur_state == 1:
+                        live_ord_neighbors, live_spec_neighbors = self.getNeighborsVonNeumannOr(i, j, "None")
+                        if live_ord_neighbors or live_spec_neighbors: new_state = 6
+                        else: new_state = 2
+                    if cur_state == 2:
+                        live_ord_neighbors, live_spec_neighbors = self.getNeighborsVonNeumannOr(i, j, "None")
+                        if live_ord_neighbors or live_spec_neighbors: new_state = 5
+                        else: new_state = 3
+                    if cur_state == 3:
+                        live_ord_neighbors, live_spec_neighbors = self.getNeighborsVonNeumannOr(i, j, "None")
+                        if live_ord_neighbors or live_spec_neighbors: new_state = 15
+                        else: new_state = 4
+                    if cur_state == 4:
+                        live_ord_neighbors, live_spec_neighbors = self.getNeighborsVonNeumannOr(i, j, "None")
+                        if live_ord_neighbors or live_spec_neighbors: new_state = 13
+                        else: new_state = 16
+                    if cur_state == 5:
+                        live_ord_neighbors, live_spec_neighbors = self.getNeighborsVonNeumannOr(i, j, "None")
+                        if live_ord_neighbors or live_spec_neighbors: new_state = 24
+                        else: new_state = 14
+                    if cur_state == 6:
+                        live_ord_neighbors, live_spec_neighbors = self.getNeighborsVonNeumannOr(i, j, "None")
+                        if live_ord_neighbors or live_spec_neighbors: new_state = 8
+                        else: new_state = 7
+                    if cur_state == 7:
+                        live_ord_neighbors, live_spec_neighbors = self.getNeighborsVonNeumannOr(i, j, "None")
+                        if live_ord_neighbors or live_spec_neighbors: new_state = 23
+                        else: new_state = 21
+                    if cur_state == 8:
+                        live_ord_neighbors, live_spec_neighbors = self.getNeighborsVonNeumannOr(i, j, "None")
+                        if live_ord_neighbors or live_spec_neighbors: new_state = 9
+                        else: new_state = 22
 
                     new_cells[pos] = new_state
             self.cells = new_cells
