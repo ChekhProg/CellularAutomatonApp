@@ -105,13 +105,15 @@ class UniverseView(QGraphicsView):
         if not btn is None:
             btn.setChecked(False)
         etime = time.time() - stime
-        print("Gen: {}, Draw: {} All: {}".format(etime_calc, etime-etime_calc, etime))
+        #print("Gen: {}, Draw: {} All: {}".format(etime_calc, etime-etime_calc, etime))
 
     def reset(self):
+        self.universe_prev_cells = np.copy(self.universe.cells)
         self.universe.clear()
         self.redrawUniverse()
 
     def randomize(self):
+        self.universe_prev_cells = np.copy(self.universe.cells)
         self.universe.setRandom()
         self.redrawUniverse()
 

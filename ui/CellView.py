@@ -15,7 +15,6 @@ class CellView(QGraphicsRectItem):
         if e.button() == Qt.MouseButton.LeftButton:
             i = self.y
             j = self.x
-            #new_state = self.universe.changeCellState(i, j)
             new_state = self.universe.changeCellState(i, j, self.view.drawer_state)
             #print("x: {}, y: {}, state: {}".format(self.x, self.y, new_state))
             brush = QBrush(self.universe.colors[new_state])
