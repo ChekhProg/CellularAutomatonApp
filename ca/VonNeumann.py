@@ -24,11 +24,11 @@ class VonNeumann(CellularAutomaton):
                            "C_01": QColor(33, 215, 215),
                            "C_10": QColor(255, 255, 128),
                            "C_11": QColor(255, 128, 64),
-                           "OT_N_Q": QColor(106, 106, 255),  # 13
+                           "OT_N_Q": QColor(106, 106, 255),
                            "OT_S_Q": QColor(139, 139, 255),
                            "OT_W_Q": QColor(122, 122, 255),
                            "OT_E_Q": QColor(89, 89, 255),
-                           "OT_N_E": QColor(36, 200, 36),  # 17
+                           "OT_N_E": QColor(36, 200, 36),
                            "OT_S_E": QColor(106, 255, 106),
                            "OT_W_E": QColor(73, 255, 73),
                            "OT_E_E": QColor(27, 176, 27),
@@ -100,7 +100,8 @@ class VonNeumann(CellularAutomaton):
         live_spec_neighbors = False
         if ord_quiescent_neighbors == 0 and ord_excited_neighbors > 0:
             live_ord_neighbors = True
-        if spec_quiescent_neighbors == 0 and spec_excited_neighbors > 0:
+        #if spec_quiescent_neighbors == 0 and spec_excited_neighbors > 0:
+        if spec_excited_neighbors > 0:
             live_spec_neighbors = True
         return live_ord_neighbors, live_spec_neighbors
 

@@ -102,7 +102,7 @@ class ToolBarJvN(QWidget):
         state_label = QLabel("Cell drawer state:")
         self.state_btns = []
 
-        btn_state_size = QSize(40, 40)
+        btn_state_size = QSize(35, 35)
 
         btn_u = QPushButton("U")
         btn_u.clicked.connect(lambda e: self.changeDrawerState(e, 0))
@@ -250,7 +250,7 @@ class ToolBarJvN(QWidget):
         self.state_btns.append(btn_st_e_e)
 
         for i, btn in enumerate(self.state_btns):
-            btn.setFont(QFont('Arial', 7))
+            btn.setFont(QFont('Arial', 6))
             btn.setCheckable(True)
             btn.setFixedSize(btn_state_size)
 

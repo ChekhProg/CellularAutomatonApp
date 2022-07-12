@@ -4,12 +4,12 @@ from PyQt6.QtWidgets import QGraphicsRectItem
 
 
 class CellView(QGraphicsRectItem):
-    def __init__(self, drawer_state, universe, size, x, y):
+    def __init__(self, view, universe, size, x, y):
         super().__init__(0, 0, size, size)
         self.x = x
         self.y = y
         self.universe = universe
-        self.view = drawer_state
+        self.view = view
 
     def mousePressEvent(self, e):
         if e.button() == Qt.MouseButton.LeftButton:
